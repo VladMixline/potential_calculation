@@ -194,6 +194,88 @@ std::vector < double > create_fi() {
 }
 
 
+double lapl(int i, int j, std::vector<double> *fi){
+    return ((*fi)[(i - 1) * h + j] - 2 * (*fi)[i * h + j] + (*fi)[(i + 1) * h + j]) / h + \
+    ((*fi)[i * h + j - 1] - 2 * (*fi)[i * h + j] + (*fi)[i * h + j + 1]) / h;
+}
+
+
+double regional_1(int j, std::vector<double> *fi){
+    return ((*fi)[h + j] - (*fi)[j]) / h;
+}
+
+
+double regional_2(int j, std::vector<double> *fi){
+    return ((*fi)[(h - 1) * h + j] - (*fi)[(h - 2) * h + j]) / h;
+}
+
+
+double regional_3(int i, std::vector<double> *fi){
+    return ((*fi)[i * h + 1] - (*fi)[i * h]) / h;
+}
+
+
+double regional_4(int i, std::vector<double> *fi){
+    return ((*fi)[i * h + h - 1] - (*fi)[i * h + h - 2]) / h;
+}
+
+
+double regional_anod(int i, std::vector<double> *fi){
+    return (*fi)[i * h] + 1.2 -  U;
+}
+
+
+double regional_katod(int i, std::vector<double> *fi){
+    return (*fi)[i * h + h - 1] - calc_Fc(i, fi);
+}
+
+
+double calc_i_katod(int i, std::vector<double> *fi){
+    return -1 * X * ((*fi)[i * h + h - 1] - (*fi)[i * h + h - 2]) / h;
+}
+
+
+double calc_Fc(int i, std::vector<double> *fi){
+    double i = calc_i_katod(i, fi);
+    return 0.0016 * i * i + 0.055 * i + 1.347;
+}
+
+
+std::vector < double > calc_fi(std::vector < double > *fi){
+    std::vector < double > res;
+    for (int i = 1; i < h - 1; i++) {
+		for (int j = 1; j < h - 1; j++) {
+			res.push_back(lapl(i, j, fi));
+		}
+	}
+	for (int j = 1; j < h - 1; j++) {
+        res.push_back(regional_1(j, fi));
+	}
+	for (int j = 1; j < h - 1; j++) {
+        res.push_back(regional_2(j, fi));
+	}
+	for (int i = 0; i < al - 1; i++) {
+		res.push_back(regional_3(i, fi));
+	}
+	for (int i = ar; i < h; i++) {
+		res.push_back(regional_3(i, fi));
+	}
+	for (int i = 0; i < cl - 1; i++) {
+        res.push_back(regional_4(i, fi));
+	}
+	for (int i = cr; i < h; i++) {
+        res.push_back(regional_4(i, fi));
+	}
+	for (int i = al - 1; i < ar; i++) {
+		res.push_back(regional_anod(i, fi));
+	}
+	for (int i = cl - 1; i < cr; i++) {
+        res.push_back(regional_katod(i, fi));
+	}
+    return res;
+}
+
+
 int main() {
     //Открытие файлов для ввода и вывода данных
     std::ifstream in("input.txt");
@@ -224,7 +306,11 @@ int main() {
             for(int j=0;j<h*h;j++)
                 yakob_in_line.push_back(yakob[i][j]);
         yakob_in_line = get_obr(yakob_in_line, h*h, h*h);
-        std::vector < double > fi_ = fi;
+        std::vector < double > fi_ = calc_fi(&fi);
+        for(auto it:fi_){
+            out << std::setw(6) << it;
+        }
+        out << std::endl;
         mul(&yakob_in_line,&fi_,h*h,h*h,1);
         eps = 0;
         for(int i=0;i<h*h;i++){
