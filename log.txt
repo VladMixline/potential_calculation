@@ -1,0 +1,33 @@
+Iteration 1
+Residual norm: 49.2836
+Average error: 1.02708
+Iteration 2
+Residual norm: 24.5919
+Average error: 0.399132
+Iteration 3
+Residual norm: 12.284
+Average error: 0.169841
+Iteration 4
+Residual norm: 6.13869
+Average error: 0.0766911
+Iteration 5
+Residual norm: 3.06844
+Average error: 0.0373991
+Iteration 6
+Residual norm: 1.534
+Average error: 0.0191337
+Iteration 7
+Residual norm: 0.766958
+Average error: 0.0103166
+Iteration 8
+Residual norm: 0.383481
+Average error: 0.00571662
+Iteration 9
+Residual norm: 0.191749
+Average error: 0.00309886
+Iteration 10
+Residual norm: 0.0958805
+Average error: 0.00165323
+Iteration 11
+Residual norm: 0.0479437
+Average error: 0.000871455

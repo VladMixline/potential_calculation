@@ -6,7 +6,10 @@
 #include <iomanip>
 
 
-double N, al, ar, cl, cr, X = 0.35, U, hx = 0.3, hy = 0.3;
+double N, al, ar, cl, cr, X = 0.35, U, hx = 0.034, hy = 0.034;
+
+
+std::ofstream out_("output_test.txt");
 
 void vector_copy(std::vector < double > *vec_1,
     std:: vector < double > *vec_2){
@@ -176,8 +179,8 @@ std::vector < std::vector < double > > make_yakob(std::vector < double > *fi) {
 		yakob[line][i * N] += 1;
 	}
 	for (int i = cl - 1; i < cr; i++, line++) {
-		yakob[line][i * N + N - 1] += 1.0 - (0.0032 * -1 * X * (*fi)[i * N + N - 1] / hy + 0.055) * (-1 * X / hy);
-		yakob[line][i * N + N - 2] -= (0.0032 * X * (*fi)[i * N + N - 2] / hy + 0.055) * (X / hy);
+		yakob[line][i * N + N - 1] += 1.0 - 0.0032 * X * X / hy / hy * ((*fi)[i * N + N - 1] - (*fi)[i * N + N - 2]) + 0.055 * X / hy;
+		yakob[line][i * N + N - 2] += 0.0032 * X * X / hy / hy * ((*fi)[i * N + N - 1] - (*fi)[i * N + N - 2]) - 0.055 * (X / hy);
 	}
 	return yakob;
 }
@@ -195,8 +198,8 @@ std::vector < double > create_fi() {
 
 
 double lapl(int i, int j, std::vector<double> *fi){
-    return ((*fi)[(i - 1) * N + j] - 2 * (*fi)[i * N + j] + (*fi)[(i + 1) * N + j]) / hx + \
-    ((*fi)[i * N + j - 1] - 2 * (*fi)[i * N + j] + (*fi)[i * N + j + 1]) / hy;
+    return ((*fi)[(i - 1) * N + j] - 2 * (*fi)[i * N + j] + (*fi)[(i + 1) * N + j]) / (hx * hx) + \
+    ((*fi)[i * N + j - 1] - 2 * (*fi)[i * N + j] + (*fi)[i * N + j + 1]) / (hy * hy);
 }
 
 
@@ -211,6 +214,9 @@ double regional_2(int j, std::vector<double> *fi){
 
 
 double regional_3(int i, std::vector<double> *fi){
+    out_ << i << " " << 1 <<" " << (*fi)[i * N + 1] << std::endl;
+    out_ << i << " " << 0 <<" " << (*fi)[i * N] << std::endl;
+    out_ << ((*fi)[i * N + 1] - (*fi)[i * N]) / hy << std::endl << std::endl;
     return ((*fi)[i * N + 1] - (*fi)[i * N]) / hy;
 }
 
@@ -287,47 +293,39 @@ int main() {
     std::ifstream in("input.txt");
     std::ofstream out("output.txt");
 
-    // int row;          // Количество строк матрицы A
-    // int col;    // Количество столбцов A и строк B
-    // // Ввод размеров первой матрицы
-    // in >> row >> col;
-
-    // //Инициализация и ввод первой матрицы
-    // std::vector<double> h_A(row * col);
-    // for(int i = 0; i < row * col; i++) {
-    //     in >> h_A[i];
-    // }
-    // h_A = get_obr(h_A, row, col);
-    // print_matrix(&h_A, &out, row, col);
-
-    
     in >> N >> al >> ar >> cl >> cr >> U;
-    //N = 4, al = 2, ar = 3, cl = 2, cr = 3, U = 5;
 	std::vector < double > fi = create_fi();
 
     print_matrix(&fi, &out, N, N);
     out << std::endl;
+
     double eps = 1;
-    while(eps > 0.001){
+    while(eps > 0.00001){
 	    std::vector < std::vector < double > > yakob = make_yakob(&fi);
         std::vector < double > yakob_in_line;
         for(int i = 0; i < N * N; i++)
             for(int j = 0; j < N * N; j++)
                 yakob_in_line.push_back(yakob[i][j]);
-        //print_matrix(&yakob_in_line,&out, N*N, N*N);
+        
+        out << "Якобиан на очередной итерации:\n";
+        print_matrix(&yakob_in_line,&out, N*N, N*N);
+
         yakob_in_line = get_obr(yakob_in_line, N * N, N * N);
         std::vector < double > fi_ = calc_fi(&fi);
         mul(&yakob_in_line, &fi_, N * N, N * N, 1);
-        for(auto it:fi_){
-            out << std::setw(15) << it;
-        }
-        out << std::endl << fi_.size() << std::endl;
+
+        out << "Ошибка потенциала на очередной итерации:\n";
+        print_matrix(&fi_, &out, N, N);
+
         eps = 0;
         for(int i = 0; i < N * N; i++){
             fi[i] -= fi_[i];
             eps += abs(fi_[i]);
         }
+
+        out << "Распределение потенциала на очередной итерации:\n";
         print_matrix(&fi, &out, N, N);
+
     }
 
 
@@ -341,21 +339,6 @@ int main() {
 
     //print_matrix(&fi, &out, N, N);
 
-    
-    //вывод распределения потенциала, анод сверху, катод снизу, т.е. у = 0 (j) для анода находится сверху
-	// for (int j = 0; j < N; j++) {
-	// 	for (int i = 0; i < N; i++) {
-	// 		std::cout << fi[i * N + j] << " ";
-	// 	}
-	// 	std::cout << std::endl;
-	// }
-	// for (int i = 0; i < N * N; i++) {
-	// 	for (auto it : yakob[i])
-	// 		std::cout << std::setw(10) << it;
-	// 	std::cout << std::endl;
-	// }
-
-
     // int row,col_row,col;
     // in>>row>>col_row>>col;
     // std::vector<double> h_A(row * col_row);
@@ -366,7 +349,6 @@ int main() {
     // for(int i = 0; i < col_row * col; i++) {
     //     in >> h_B[i];
     // }
-
     // mul(&h_A,&h_B,row, col_row,col);
     // print_matrix(&h_B, &out, col_row, col);
 }

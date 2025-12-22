@@ -8,6 +8,9 @@
 
 double N, al, ar, cl, cr, X = 0.35, U, hx = 0.034, hy = 0.034;
 
+
+std::ofstream out_("output_test.txt");
+
 void vector_copy(std::vector < double > *vec_1,
     std:: vector < double > *vec_2){
     (*vec_2).clear();
@@ -211,6 +214,9 @@ double regional_2(int j, std::vector<double> *fi){
 
 
 double regional_3(int i, std::vector<double> *fi){
+    out_ << i << " " << 1 <<" " << (*fi)[i * N + 1] << std::endl;
+    out_ << i << " " << 0 <<" " << (*fi)[i * N] << std::endl;
+    out_ << ((*fi)[i * N + 1] - (*fi)[i * N]) / hy << std::endl << std::endl;
     return ((*fi)[i * N + 1] - (*fi)[i * N]) / hy;
 }
 
