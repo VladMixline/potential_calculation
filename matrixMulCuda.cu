@@ -275,6 +275,11 @@ std::vector < double > calc_fi(std::vector < double > *fi){
     return res;
 }
 
+double calc_thickness(int i, std::vector < double > *fi){
+    double kme = 1.22, dn = 7.133, dt = 420;
+    return kme * X / dn * ((*fi)[i * h + h - 2] - (*fi)[i * h + h - 1]) / h * dt;
+}
+
 
 int main() {
     //Открытие файлов для ввода и вывода данных
@@ -300,27 +305,39 @@ int main() {
 	std::vector < double > fi = create_fi();
 
     print_matrix(&fi, &out, h, h);
+    out << std::endl;
     double eps = 1;
-    while(eps > 0.000001){
+    while(eps > 0.001){
 	    std::vector < std::vector < double > > yakob = make_yakob(&fi);
         std::vector < double > yakob_in_line;
         for(int i=0;i<h*h;i++)
             for(int j=0;j<h*h;j++)
                 yakob_in_line.push_back(yakob[i][j]);
+        //print_matrix(&yakob_in_line,&out, h*h, h*h);
         yakob_in_line = get_obr(yakob_in_line, h*h, h*h);
         std::vector < double > fi_ = calc_fi(&fi);
+        mul(&yakob_in_line,&fi_,h*h,h*h,1);
         for(auto it:fi_){
             out << std::setw(15) << it;
         }
         out << std::endl << fi_.size() << std::endl;
-        mul(&yakob_in_line,&fi_,h*h,h*h,1);
         eps = 0;
         for(int i=0;i<h*h;i++){
             fi[i] -= fi_[i];
-            eps += fi_[i];
+            eps += abs(fi_[i]);
         }
+        print_matrix(&fi, &out, h, h);
     }
-    print_matrix(&fi, &out, h, h);
+
+    std::vector < double > thickness;
+    for (int i = 0; i < h; i++) {
+        thickness.push_back(calc_thickness(i, &fi));
+	}
+
+    for(auto it : thickness)
+        out << it << "  "; 
+    
+    //print_matrix(&fi, &out, h, h);
 
     
     //вывод распределения потенциала, анод сверху, катод снизу, т.е. у = 0 (j) для анода находится сверху
