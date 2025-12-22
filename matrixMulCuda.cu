@@ -195,8 +195,8 @@ std::vector < double > create_fi() {
 
 
 double lapl(int i, int j, std::vector<double> *fi){
-    return ((*fi)[(i - 1) * N + j] - 2 * (*fi)[i * N + j] + (*fi)[(i + 1) * N + j]) / hx + \
-    ((*fi)[i * N + j - 1] - 2 * (*fi)[i * N + j] + (*fi)[i * N + j + 1]) / hy;
+    return ((*fi)[(i - 1) * N + j] - 2 * (*fi)[i * N + j] + (*fi)[(i + 1) * N + j]) / (hx * hx) + \
+    ((*fi)[i * N + j - 1] - 2 * (*fi)[i * N + j] + (*fi)[i * N + j + 1]) / (hy * hy);
 }
 
 
@@ -287,26 +287,12 @@ int main() {
     std::ifstream in("input.txt");
     std::ofstream out("output.txt");
 
-    // int row;          // Количество строк матрицы A
-    // int col;    // Количество столбцов A и строк B
-    // // Ввод размеров первой матрицы
-    // in >> row >> col;
-
-    // //Инициализация и ввод первой матрицы
-    // std::vector<double> h_A(row * col);
-    // for(int i = 0; i < row * col; i++) {
-    //     in >> h_A[i];
-    // }
-    // h_A = get_obr(h_A, row, col);
-    // print_matrix(&h_A, &out, row, col);
-
-    
     in >> N >> al >> ar >> cl >> cr >> U;
-    //N = 4, al = 2, ar = 3, cl = 2, cr = 3, U = 5;
 	std::vector < double > fi = create_fi();
 
     print_matrix(&fi, &out, N, N);
     out << std::endl;
+
     double eps = 1;
     while(eps > 0.001){
 	    std::vector < std::vector < double > > yakob = make_yakob(&fi);
@@ -314,11 +300,15 @@ int main() {
         for(int i = 0; i < N * N; i++)
             for(int j = 0; j < N * N; j++)
                 yakob_in_line.push_back(yakob[i][j]);
-        //print_matrix(&yakob_in_line,&out, N*N, N*N);
+        
+        out << "Якобиан на очередной итерации:\n";
+        print_matrix(&yakob_in_line,&out, N*N, N*N);
+
         yakob_in_line = get_obr(yakob_in_line, N * N, N * N);
         std::vector < double > fi_ = calc_fi(&fi);
         mul(&yakob_in_line, &fi_, N * N, N * N, 1);
 
+        out << "Ошибка потенциала на очередной итерации:\n";
         print_matrix(&fi_, &out, N, N);
 
         eps = 0;
@@ -327,6 +317,7 @@ int main() {
             eps += abs(fi_[i]);
         }
 
+        out << "Распределение потенциала на очередной итерации:\n";
         print_matrix(&fi, &out, N, N);
 
     }
