@@ -5,8 +5,8 @@
 #include <fstream>
 #include <iomanip>
 
-
-double N, al, ar, cl, cr, X = 0.35, U, hx = 0.034, hy = 0.034;
+double width = 0.99;
+double N, al, ar, cl, cr, X = 0.35, U, hx, hy;
 
 
 std::ofstream out_("output_test.txt");
@@ -294,8 +294,16 @@ int main() {
     std::ofstream out("output.txt");
 
     in >> N >> al >> ar >> cl >> cr >> U;
+    hx = width / (N - 1), hy = width / (N - 1);
+    out << "Размер сетки: " << N << " X " << N << std::endl;
+    out << "Координаты анода: " << al << " " << ar << std::endl;
+    out << "Координаты катода: " << cl << " " << cr << std::endl;
+    out << "Напряжение на аноде: " << U << std::endl;
+    out << "Шаг hx и hy: " << hx << " " << hy << std::endl << std::endl;
+
 	std::vector < double > fi = create_fi();
 
+    out << "Приближенное распределение потенциала:\n";
     print_matrix(&fi, &out, N, N);
     out << std::endl;
 
