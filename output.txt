@@ -1,22 +1,18 @@
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
--nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
+5 4.16667 3.33333 2.5 1.66667 0.833333 0 
+5 4.16667 3.33333 2.5 1.66667 0.833333 0 
+5 4.16667 3.33333 2.5 1.66667 0.833333 0 
+5 4.16667 3.33333 2.5 1.66667 0.833333 0 
+5 4.16667 3.33333 2.5 1.66667 0.833333 0 
+5 4.16667 3.33333 2.5 1.66667 0.833333 0 
+5 4.16667 3.33333 2.5 1.66667 0.833333 0 
+
+   -6.34413e-17              0    3.17207e-17   -1.58603e-17              0   -6.34413e-17              0    3.17207e-17   -1.58603e-17              0   -6.34413e-17              0    3.17207e-17   -1.58603e-17              0   -6.34413e-17              0    3.17207e-17   -1.58603e-17              0   -6.34413e-17              0    3.17207e-17   -1.58603e-17              0              0              0              0              0              0              0              0              0              0              0      -0.119048      -0.119048      -0.119048      -0.119048      -0.119048      -0.119048      -0.119048      -0.119048            1.2            1.2            1.2       -1.34929       -1.34929       -1.34929
+49
+5.45315 4.59794 3.30193 1.46466 2.74141 0.761932 0.22561 
+5.2886 3.84708 3.63364 2.01449 1.45086 0.700767 -0.331347 
+3.57523 4.20411 3.21023 2.47306 2.05866 0.694795 0.310052 
+5.26448 4.17074 3.6843 2.23315 1.75945 0.885948 0.293679 
+4.70765 4.22403 3.36924 2.57615 1.64751 0.977812 -0.0384622 
+5.22358 4.49173 3.60665 2.60728 1.78852 0.693586 0.107535 
+5.08223 3.90199 2.89627 2.17094 2.0258 1.28266 0.366627 
 

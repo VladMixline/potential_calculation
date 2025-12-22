@@ -225,19 +225,19 @@ double regional_anod(int i, std::vector<double> *fi){
 }
 
 
-double regional_katod(int i, std::vector<double> *fi){
-    return (*fi)[i * h + h - 1] - calc_Fc(i, fi);
-}
-
-
 double calc_i_katod(int i, std::vector<double> *fi){
     return -1 * X * ((*fi)[i * h + h - 1] - (*fi)[i * h + h - 2]) / h;
 }
 
 
 double calc_Fc(int i, std::vector<double> *fi){
-    double i = calc_i_katod(i, fi);
-    return 0.0016 * i * i + 0.055 * i + 1.347;
+    double ic = calc_i_katod(i, fi);
+    return 0.0016 * ic * ic + 0.055 * ic + 1.347;
+}
+
+
+double regional_katod(int i, std::vector<double> *fi){
+    return (*fi)[i * h + h - 1] - calc_Fc(i, fi);
 }
 
 
@@ -298,6 +298,8 @@ int main() {
     in >> h >> al >> ar >> cl >> cr >> U;
     //h = 4, al = 2, ar = 3, cl = 2, cr = 3, U = 5;
 	std::vector < double > fi = create_fi();
+
+    print_matrix(&fi, &out, h, h);
     double eps = 1;
     while(eps > 0.000001){
 	    std::vector < std::vector < double > > yakob = make_yakob(&fi);
@@ -308,9 +310,9 @@ int main() {
         yakob_in_line = get_obr(yakob_in_line, h*h, h*h);
         std::vector < double > fi_ = calc_fi(&fi);
         for(auto it:fi_){
-            out << std::setw(6) << it;
+            out << std::setw(15) << it;
         }
-        out << std::endl;
+        out << std::endl << fi_.size() << std::endl;
         mul(&yakob_in_line,&fi_,h*h,h*h,1);
         eps = 0;
         for(int i=0;i<h*h;i++){
