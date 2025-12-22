@@ -25,7 +25,7 @@ void vector_copy(std::vector < double > vec_1,
 }
 
 // Умножение матриц с использованием cuBLAS
-void matrixMultiplyCuBLAS(double* A, double* B, double* C, int M, int N, int P) {
+void matrixMultiplyCuBLAS(double* A, double* B, double* C, int M, int N_, int P) {
     cublasHandle_t handle;
     cublasCreate(&handle);
     
@@ -35,10 +35,10 @@ void matrixMultiplyCuBLAS(double* A, double* B, double* C, int M, int N, int P) 
     cublasDgemm_v2(handle, 
                 CUBLAS_OP_N,      // Без транспонирования матрицы A
                 CUBLAS_OP_N,      // Без транспонирования матрицы B
-                P, M, N,          // Размеры для column-major порядка
+                P, M, N_,          // Размеры для column-major порядка
                 &alpha, 
                 B, P,             // Матрица B и ее leading dimension
-                A, N,             // Матрица A и ее leading dimension
+                A, N_,             // Матрица A и ее leading dimension
                 &beta, 
                 C, P);            // Матрица C (результат) и ее leading dimension
     

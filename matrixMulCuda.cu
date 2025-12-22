@@ -6,7 +6,7 @@
 #include <iomanip>
 
 
-double h, al, ar, cl, cr, X = 0.35, U;
+double N, al, ar, cl, cr, X = 0.35, U, hx = 0.034, hy = 0.034;
 
 void vector_copy(std::vector < double > *vec_1,
     std:: vector < double > *vec_2){
@@ -25,7 +25,7 @@ void vector_copy(std::vector < double > vec_1,
 }
 
 // Умножение матриц с использованием cuBLAS
-void matrixMultiplyCuBLAS(double* A, double* B, double* C, int M, int N, int P) {
+void matrixMultiplyCuBLAS(double* A, double* B, double* C, int M, int N_, int P) {
     cublasHandle_t handle;
     cublasCreate(&handle);
     
@@ -35,10 +35,10 @@ void matrixMultiplyCuBLAS(double* A, double* B, double* C, int M, int N, int P) 
     cublasDgemm_v2(handle, 
                 CUBLAS_OP_N,      // Без транспонирования матрицы A
                 CUBLAS_OP_N,      // Без транспонирования матрицы B
-                P, M, N,          // Размеры для column-major порядка
+                P, M, N_,          // Размеры для column-major порядка
                 &alpha, 
                 B, P,             // Матрица B и ее leading dimension
-                A, N,             // Матрица A и ее leading dimension
+                A, N_,             // Матрица A и ее leading dimension
                 &beta, 
                 C, P);            // Матрица C (результат) и ее leading dimension
     
@@ -137,96 +137,96 @@ std::vector < double > get_obr(std :: vector < double > h_A, int row, int col){
 
 
 std::vector < std::vector < double > > make_yakob(std::vector < double > *fi) {
-	std::vector < std::vector < double > > yakob(h * h, std::vector < double >(h * h, 0));
+	std::vector < std::vector < double > > yakob(N * N, std::vector < double >(N * N, 0));
 	int line = 0;
-	for (int i = 1; i < h - 1; i++) {
-		for (int j = 1; j < h - 1; j++, line++) {
-			yakob[line][i * h + j] -= 4;
-			yakob[line][(i - 1) * h + j] += 1;
-			yakob[line][(i + 1) * h + j] += 1;
-			yakob[line][i * h + j - 1] += 1;    
-			yakob[line][i * h + j + 1] += 1;
+	for (int i = 1; i < N - 1; i++) {
+		for (int j = 1; j < N - 1; j++, line++) {
+			yakob[line][i * N + j] -= 4;
+			yakob[line][(i - 1) * N + j] += 1;
+			yakob[line][(i + 1) * N + j] += 1;
+			yakob[line][i * N + j - 1] += 1;    
+			yakob[line][i * N + j + 1] += 1;
 		}
 	}
-	for (int j = 1; j < h - 1; j++, line++) {
+	for (int j = 1; j < N - 1; j++, line++) {
 		yakob[line][j] -= 1;
-		yakob[line][h + j] += 1;
+		yakob[line][N + j] += 1;
 	}
-	for (int j = 1; j < h - 1; j++, line++) {
-		yakob[line][(h - 2) * h + j] -= 1;
-		yakob[line][(h - 1) * h + j] += 1;
+	for (int j = 1; j < N - 1; j++, line++) {
+		yakob[line][(N - 2) * N + j] -= 1;
+		yakob[line][(N - 1) * N + j] += 1;
 	}
 	for (int i = 0; i < al - 1; i++, line++) {
-		yakob[line][i * h + 1] += 1;
-		yakob[line][i * h] -= 1;
+		yakob[line][i * N + 1] += 1;
+		yakob[line][i * N] -= 1;
 	}
-	for (int i = ar; i < h; i++, line++) {
-		yakob[line][i * h + 1] += 1;
-		yakob[line][i * h] -= 1;
+	for (int i = ar; i < N; i++, line++) {
+		yakob[line][i * N + 1] += 1;
+		yakob[line][i * N] -= 1;
 	}
 	for (int i = 0; i < cl - 1; i++, line++) {
-		yakob[line][i * h + h - 1] += 1;
-		yakob[line][i * h + h - 2] -= 1;
+		yakob[line][i * N + N - 1] += 1;
+		yakob[line][i * N + N - 2] -= 1;
 	}
-	for (int i = cr; i < h; i++, line++) {
-		yakob[line][i * h + h - 1] += 1;
-		yakob[line][i * h + h - 2] -= 1;
+	for (int i = cr; i < N; i++, line++) {
+		yakob[line][i * N + N - 1] += 1;
+		yakob[line][i * N + N - 2] -= 1;
 	}
 	for (int i = al - 1; i < ar; i++, line++) {
-		yakob[line][i * h] += 1;
+		yakob[line][i * N] += 1;
 	}
 	for (int i = cl - 1; i < cr; i++, line++) {
-		yakob[line][i * h + h - 1] += 1.0 - (0.0032 * -1 * X * (*fi)[i * h + h - 1] / h + 0.055) * (-1 * X / h);
-		yakob[line][i * h + h - 2] -= (0.0032 * X * (*fi)[i * h + h - 2] / h + 0.055) * (X / h);
+		yakob[line][i * N + N - 1] += 1.0 - 0.0032 * X * X / hy / hy * ((*fi)[i * N + N - 1] - (*fi)[i * N + N - 2]) + 0.055 * X / hy;
+		yakob[line][i * N + N - 2] += 0.0032 * X * X / hy / hy * ((*fi)[i * N + N - 1] - (*fi)[i * N + N - 2]) - 0.055 * (X / hy);
 	}
 	return yakob;
 }
 
 std::vector < double > create_fi() {
-	std::vector < double > fi(h * h, 0);
-	for (int i = 0; i < h; i++)
-		fi[i * h] = U;
-	for (int i = 0; i < h; i++)
-		for (int j = 1; j < h - 1; j++) {
-			fi[i * h + j] = U * (h - j - 1) / (h - 1);
+	std::vector < double > fi(N * N, 0);
+	for (int i = 0; i < N; i++)
+		fi[i * N] = U;
+	for (int i = 0; i < N; i++)
+		for (int j = 1; j < N - 1; j++) {
+			fi[i * N + j] = U * (N - j - 1) / (N - 1);
 		}
 	return fi;
 }
 
 
 double lapl(int i, int j, std::vector<double> *fi){
-    return ((*fi)[(i - 1) * h + j] - 2 * (*fi)[i * h + j] + (*fi)[(i + 1) * h + j]) / h + \
-    ((*fi)[i * h + j - 1] - 2 * (*fi)[i * h + j] + (*fi)[i * h + j + 1]) / h;
+    return ((*fi)[(i - 1) * N + j] - 2 * (*fi)[i * N + j] + (*fi)[(i + 1) * N + j]) / hx + \
+    ((*fi)[i * N + j - 1] - 2 * (*fi)[i * N + j] + (*fi)[i * N + j + 1]) / hy;
 }
 
 
 double regional_1(int j, std::vector<double> *fi){
-    return ((*fi)[h + j] - (*fi)[j]) / h;
+    return ((*fi)[N + j] - (*fi)[j]) / hx;
 }
 
 
 double regional_2(int j, std::vector<double> *fi){
-    return ((*fi)[(h - 1) * h + j] - (*fi)[(h - 2) * h + j]) / h;
+    return ((*fi)[(N - 1) * N + j] - (*fi)[(N - 2) * N + j]) / hx;
 }
 
 
 double regional_3(int i, std::vector<double> *fi){
-    return ((*fi)[i * h + 1] - (*fi)[i * h]) / h;
+    return ((*fi)[i * N + 1] - (*fi)[i * N]) / hy;
 }
 
 
 double regional_4(int i, std::vector<double> *fi){
-    return ((*fi)[i * h + h - 1] - (*fi)[i * h + h - 2]) / h;
+    return ((*fi)[i * N + N - 1] - (*fi)[i * N + N - 2]) / hy;
 }
 
 
 double regional_anod(int i, std::vector<double> *fi){
-    return (*fi)[i * h] + 1.2 -  U;
+    return (*fi)[i * N] + 1.2 -  U;
 }
 
 
 double calc_i_katod(int i, std::vector<double> *fi){
-    return -1 * X * ((*fi)[i * h + h - 1] - (*fi)[i * h + h - 2]) / h;
+    return -1 * X * ((*fi)[i * N + N - 1] - (*fi)[i * N + N - 2]) / hy;
 }
 
 
@@ -237,33 +237,33 @@ double calc_Fc(int i, std::vector<double> *fi){
 
 
 double regional_katod(int i, std::vector<double> *fi){
-    return (*fi)[i * h + h - 1] - calc_Fc(i, fi);
+    return (*fi)[i * N + N - 1] - calc_Fc(i, fi);
 }
 
 
 std::vector < double > calc_fi(std::vector < double > *fi){
     std::vector < double > res;
-    for (int i = 1; i < h - 1; i++) {
-		for (int j = 1; j < h - 1; j++) {
+    for (int i = 1; i < N - 1; i++) {
+		for (int j = 1; j < N - 1; j++) {
 			res.push_back(lapl(i, j, fi));
 		}
 	}
-	for (int j = 1; j < h - 1; j++) {
+	for (int j = 1; j < N - 1; j++) {
         res.push_back(regional_1(j, fi));
 	}
-	for (int j = 1; j < h - 1; j++) {
+	for (int j = 1; j < N - 1; j++) {
         res.push_back(regional_2(j, fi));
 	}
 	for (int i = 0; i < al - 1; i++) {
 		res.push_back(regional_3(i, fi));
 	}
-	for (int i = ar; i < h; i++) {
+	for (int i = ar; i < N; i++) {
 		res.push_back(regional_3(i, fi));
 	}
 	for (int i = 0; i < cl - 1; i++) {
         res.push_back(regional_4(i, fi));
 	}
-	for (int i = cr; i < h; i++) {
+	for (int i = cr; i < N; i++) {
         res.push_back(regional_4(i, fi));
 	}
 	for (int i = al - 1; i < ar; i++) {
@@ -275,9 +275,10 @@ std::vector < double > calc_fi(std::vector < double > *fi){
     return res;
 }
 
+
 double calc_thickness(int i, std::vector < double > *fi){
     double kme = 1.22, dn = 7.133, dt = 420;
-    return kme * X / dn * ((*fi)[i * h + h - 2] - (*fi)[i * h + h - 1]) / h * dt;
+    return kme * X / dn * ((*fi)[i * N + N - 2] - (*fi)[i * N + N - 1]) / hy * dt;
 }
 
 
@@ -300,59 +301,46 @@ int main() {
     // print_matrix(&h_A, &out, row, col);
 
     
-    in >> h >> al >> ar >> cl >> cr >> U;
-    //h = 4, al = 2, ar = 3, cl = 2, cr = 3, U = 5;
+    in >> N >> al >> ar >> cl >> cr >> U;
+    //N = 4, al = 2, ar = 3, cl = 2, cr = 3, U = 5;
 	std::vector < double > fi = create_fi();
 
-    print_matrix(&fi, &out, h, h);
+    print_matrix(&fi, &out, N, N);
     out << std::endl;
     double eps = 1;
     while(eps > 0.001){
 	    std::vector < std::vector < double > > yakob = make_yakob(&fi);
         std::vector < double > yakob_in_line;
-        for(int i=0;i<h*h;i++)
-            for(int j=0;j<h*h;j++)
+        for(int i = 0; i < N * N; i++)
+            for(int j = 0; j < N * N; j++)
                 yakob_in_line.push_back(yakob[i][j]);
-        //print_matrix(&yakob_in_line,&out, h*h, h*h);
-        yakob_in_line = get_obr(yakob_in_line, h*h, h*h);
+        //print_matrix(&yakob_in_line,&out, N*N, N*N);
+        yakob_in_line = get_obr(yakob_in_line, N * N, N * N);
         std::vector < double > fi_ = calc_fi(&fi);
-        mul(&yakob_in_line,&fi_,h*h,h*h,1);
-        for(auto it:fi_){
-            out << std::setw(15) << it;
-        }
-        out << std::endl << fi_.size() << std::endl;
+        mul(&yakob_in_line, &fi_, N * N, N * N, 1);
+
+        print_matrix(&fi_, &out, N, N);
+
         eps = 0;
-        for(int i=0;i<h*h;i++){
+        for(int i = 0; i < N * N; i++){
             fi[i] -= fi_[i];
             eps += abs(fi_[i]);
         }
-        print_matrix(&fi, &out, h, h);
+
+        print_matrix(&fi, &out, N, N);
+
     }
 
+
     std::vector < double > thickness;
-    for (int i = 0; i < h; i++) {
+    for (int i = 0; i < N; i++) {
         thickness.push_back(calc_thickness(i, &fi));
 	}
 
     for(auto it : thickness)
         out << it << "  "; 
-    
-    //print_matrix(&fi, &out, h, h);
 
-    
-    //вывод распределения потенциала, анод сверху, катод снизу, т.е. у = 0 (j) для анода находится сверху
-	// for (int j = 0; j < h; j++) {
-	// 	for (int i = 0; i < h; i++) {
-	// 		std::cout << fi[i * h + j] << " ";
-	// 	}
-	// 	std::cout << std::endl;
-	// }
-	// for (int i = 0; i < h * h; i++) {
-	// 	for (auto it : yakob[i])
-	// 		std::cout << std::setw(10) << it;
-	// 	std::cout << std::endl;
-	// }
-
+    //print_matrix(&fi, &out, N, N);
 
     // int row,col_row,col;
     // in>>row>>col_row>>col;
@@ -364,7 +352,6 @@ int main() {
     // for(int i = 0; i < col_row * col; i++) {
     //     in >> h_B[i];
     // }
-
     // mul(&h_A,&h_B,row, col_row,col);
     // print_matrix(&h_B, &out, col_row, col);
 }
