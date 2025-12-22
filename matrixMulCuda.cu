@@ -315,14 +315,18 @@ int main() {
             for(int j = 0; j < N * N; j++)
                 yakob_in_line.push_back(yakob[i][j]);
         
-        out << "Якобиан на очередной итерации:\n";
-        print_matrix(&yakob_in_line,&out, N*N, N*N);
+        // out << "Якобиан на очередной итерации:\n";
+        // print_matrix(&yakob_in_line,&out, N*N, N*N);
 
         yakob_in_line = get_obr(yakob_in_line, N * N, N * N);
         std::vector < double > fi_ = calc_fi(&fi);
+
+        out << "Ошибка потенциала на очередной итерации до умножения на якобиан:\n";
+        print_matrix(&fi_, &out, N, N);
+
         mul(&yakob_in_line, &fi_, N * N, N * N, 1);
 
-        out << "Ошибка потенциала на очередной итерации:\n";
+        out << "Ошибка потенциала на очередной итерации после умножения на якобиан:\n";
         print_matrix(&fi_, &out, N, N);
 
         eps = 0;
