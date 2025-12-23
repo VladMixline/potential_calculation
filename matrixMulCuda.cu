@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <iomanip>
+#include <ctime>
 
 double width = 0.99;
 double N, al, ar, cl, cr, X = 0.35, U, hx, hy;
@@ -294,6 +295,7 @@ int main() {
     std::ofstream out("output.txt");
 
     in >> N >> al >> ar >> cl >> cr >> U;
+    int start_time = clock();
     hx = width / (N - 1), hy = width / (N - 1);
     out << "Размер сетки: " << N << " X " << N << std::endl;
     out << "Координаты анода: " << al << " " << ar << std::endl;
@@ -349,6 +351,8 @@ int main() {
     for(auto it : thickness)
         out << it << "  "; 
 
+    int end_time = clock();
+    out << "Время выполнения расчетов: " << (end_time - start_time) / CLOCKS_PER_SEC;
     //print_matrix(&fi, &out, N, N);
 
     // int row,col_row,col;
