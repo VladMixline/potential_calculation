@@ -6,3 +6,15 @@ __pycache__/
 .env
 dist/
 build/
+.vscode/
+.codex
+.venv/
+
+main
+matrixMulCuda_main
+matrixMulCuda_test
+matrix_multiply
+
+output.txt
+output_test.txt
+thickness.png
